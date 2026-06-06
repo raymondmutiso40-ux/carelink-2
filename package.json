@@ -1,0 +1,16 @@
+{
+  "name": "carelink-pro",
+  "version": "1.0.0",
+  "description": "CareLink — Proactive Patient Continuity System",
+  "main": "api/index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

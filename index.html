@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CareLink Pro — Intelligent Patient Continuity</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Mulish:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080c0f;--bg2:#0d1117;--bg3:#131920;--bg4:#1a2230;
+  --sf:#0f1823;--sf2:#16222f;
+  --b:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);
+  --t:#e8edf2;--t2:#8fa3b8;--t3:#4a6070;
+  --g:#00d68f;--g2:#00b377;--gd:rgba(0,214,143,.12);--gg:rgba(0,214,143,.28);
+  --r:#ff4d6a;--rd:rgba(255,77,106,.12);
+  --a:#ffb020;--ad:rgba(255,176,32,.12);
+  --bl:#4d9fff;--bld:rgba(77,159,255,.12);
+  --p:#a78bfa;--pd:rgba(167,139,250,.12);
+  --cy:#00d4ff;--cyd:rgba(0,212,255,.12);
+  --rr:10px;--rsm:6px;
+  --ff:'Mulish',sans-serif;--fh:'Syne',sans-serif;--fm:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--ff);background:var(--bg);color:var(--t);font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+/* APP SHELL */
+.app{display:grid;grid-template-columns:255px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+.sb{background:var(--bg2);border-right:1px solid var(--b);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo-area{padding:24px 20px 18px;border-bottom:1px solid var(--b)}
+.logo-row{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.logo-ico{width:38px;height:38px;background:var(--g);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px var(--gg);flex-shrink:0}
+.logo-ico svg{width:20px;height:20px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round}
+.logo-n{font-family:var(--fh);font-size:18px;font-weight:800;letter-spacing:-.5px}
+.logo-t{font-size:10px;color:var(--t3);letter-spacing:.05em;margin-top:1px}
+.clinic-pill{padding:9px 12px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--rsm);display:flex;align-items:center;gap:8px}
+.cpulse{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 5px var(--g);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.cname{font-size:12px;font-weight:600;color:var(--t2)}
+.ctime{font-size:10.5px;color:var(--t3);font-family:var(--fm);margin-top:1px}
+
+.nav{padding:14px 12px;flex:1}
+.ns{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);padding:10px 8px 5px;font-family:var(--fh)}
+.ni{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--rsm);cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:1px;border:1px solid transparent}
+.ni:hover{background:var(--bg3);color:var(--t)}
+.ni.active{background:var(--gd);color:var(--g);border-color:rgba(0,214,143,.18)}
+.ni svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0}
+.nbadge{margin-left:auto;background:var(--r);color:#fff;font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:10px;font-family:var(--fh)}
+.nbadge.g{background:var(--g);color:#000}
+.nbadge.b{background:var(--bl);color:#fff}
+
+/* Config panel */
+.cfg{margin:10px 12px 14px;padding:13px;background:var(--bg3);border:1px solid var(--b);border-radius:var(--rr);position:relative;overflow:hidden}
+.cfg::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--bl),var(--p))}
+.cfg-title{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:10px;font-family:var(--fh)}
+.cfg-row{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.cfg-lbl{font-size:10px;color:var(--t3);font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-family:var(--fh)}
+.cfg-inp{width:100%;padding:7px 9px;border:1px solid var(--b2);border-radius:var(--rsm);font-size:11.5px;font-family:var(--fm);background:var(--bg2);color:var(--t);outline:none;transition:border-color .15s}
+.cfg-inp:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gd)}
+.cfg-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);transition:all .3s;flex-shrink:0}
+.cfg-dot.on{background:var(--g);box-shadow:0 0 5px var(--g)}
+.cfg-status{display:flex;align-items:center;gap:6px;margin-top:5px;font-size:10.5px;color:var(--t3)}
+.model-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);background:var(--bg2);border:1px solid var(--b);border-radius:4px;padding:2px 7px;font-family:var(--fm);margin-top:6px}
+.model-tag span{color:var(--g);font-weight:500}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-height:100vh;overflow:hidden;position:relative}
+
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--b);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:30;gap:14px}
+.vtabs{display:flex;gap:2px;background:var(--bg3);padding:3px;border-radius:8px;border:1px solid var(--b)}
+.vtab{padding:5px 14px;border-radius:6px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--t3);transition:all .15s;border:none;background:none;font-family:var(--ff);white-space:nowrap}
+.vtab.active{background:var(--sf2);color:var(--t);box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tr{display:flex;align-items:center;gap:8px}
+.btn{padding:7px 15px;border-radius:var(--rsm);font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--b2);background:var(--sf2);color:var(--t2);font-family:var(--ff);transition:all .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{background:var(--bg4);color:var(--t)}
+.btn.prim{background:var(--g);color:#000;border-color:var(--g);box-shadow:0 0 14px var(--gg)}
+.btn.prim:hover{background:var(--g2)}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* CONTENT */
+.content{padding:22px 24px;flex:1;overflow-y:auto}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:22px}
+.mc{background:var(--sf);border:1px solid var(--b);border-radius:var(--rr);padding:16px 18px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;cursor:default}
+.mc:hover{border-color:var(--b2);transform:translateY(-1px)}
+.mc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.mc.mg::after{background:var(--g)}.mc.mr::after{background:var(--r)}.mc.ma::after{background:var(--a)}.mc.mb::after{background:var(--bl)}.mc.mp::after{background:var(--p)}
+.ml{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;font-family:var(--fh)}
+.mv{font-family:var(--fh);font-size:30px;font-weight:800;line-height:1;letter-spacing:-1px}
+.mv.g{color:var(--g)}.mv.r{color:var(--r)}.mv.a{color:var(--a)}.mv.b{color:var(--bl)}.mv.p{color:var(--p)}
+.ms{font-size:11px;color:var(--t3);margin-top:5px}
+.ms.up{color:var(--g)}.ms.dn{color:var(--r)}
+
+/* LAYOUT GRID */
+.grid2{display:grid;grid-template-columns:1fr 370px;gap:14px;align-items:start}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* PANEL */
+.panel{background:var(--sf);border:1px solid var(--b);border-radius:var(--rr);overflow:hidden}
+.ph{padding:14px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pt{font-family:var(--fh);font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:7px}
+.pt .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.psub{font-size:11px;color:var(--t3);margin-top:2px}
+.pact{display:flex;gap:6px;align-items:center}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);padding:9px 16px;text-align:left;background:var(--bg3);border-bottom:1px solid var(--b);font-family:var(--fh)}
+.tbl td{padding:12px 16px;border-bottom:1px solid var(--b);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+
+.pcell{display:flex;align-items:center;gap:9px}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;font-family:var(--fh);border:1.5px solid transparent}
+.pn{font-weight:600;font-size:13px}
+.pt2{font-size:11px;color:var(--t3)}
+
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:16px;font-family:var(--fh);letter-spacing:.02em}
+.bh{background:var(--rd);color:var(--r);border:1px solid rgba(255,77,106,.2)}
+.bm{background:var(--ad);color:var(--a);border:1px solid rgba(255,176,32,.2)}
+.bl2{background:var(--gd);color:var(--g);border:1px solid rgba(0,214,143,.2)}
+.bn{background:var(--bg3);color:var(--t3);border:1px solid var(--b)}
+.bp{background:var(--bld);color:var(--bl);border:1px solid rgba(77,159,255,.2)}
+.bs{background:var(--gd);color:var(--g);border:1px solid rgba(0,214,143,.2)}
+.bc{background:rgba(0,214,143,.08);color:#00e6a0;border:1px solid rgba(0,230,160,.15)}
+.bo{background:var(--rd);color:var(--r);border:1px solid rgba(255,77,106,.2)}
+.bwa{background:rgba(37,211,102,.12);color:#25d366;border:1px solid rgba(37,211,102,.2)}
+
+.sbar{width:44px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;display:inline-block}
+.sbf{height:4px;border-radius:2px;transition:width .6s ease}
+.score-cell{display:flex;flex-direction:column;gap:3px}
+.score-n{font-family:var(--fm);font-size:11px;font-weight:500}
+
+.rbtn{padding:4px 11px;border-radius:5px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--b2);background:none;color:var(--t3);font-family:var(--ff);transition:all .15s}
+.rbtn:hover{background:var(--bg4);color:var(--t)}
+.rbtn.ai{border-color:rgba(0,214,143,.3);color:var(--g);background:var(--gd)}
+.rbtn.ai:hover{background:rgba(0,214,143,.2)}
+.rbtn.wa{border-color:rgba(37,211,102,.3);color:#25d366;background:rgba(37,211,102,.1)}
+.rbtn.wa:hover{background:rgba(37,211,102,.18)}
+.rbtn.sent{border-color:var(--bld);color:var(--bl);background:var(--bld)}
+
+/* RIGHT COLUMN */
+.rc{display:flex;flex-direction:column;gap:14px}
+
+/* REMINDER FEED */
+.rfeed{max-height:420px;overflow-y:auto}
+.rcard{padding:13px 16px;border-bottom:1px solid var(--b);position:relative;transition:background .1s}
+.rcard:hover{background:rgba(255,255,255,.02)}
+.rcard:last-child{border-bottom:none}
+.rcard-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.rname{font-size:13px;font-weight:600}
+.rtime{font-size:10.5px;color:var(--t3);font-family:var(--fm)}
+.langchip{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--bld);color:var(--bl);border:1px solid rgba(77,159,255,.2);font-family:var(--fh);margin-bottom:5px;letter-spacing:.03em}
+.mbubble{font-size:12px;color:var(--t2);line-height:1.6;background:var(--bg3);border-radius:7px;padding:9px 11px;border-left:3px solid var(--g)}
+.wa-sent-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#25d366;margin-top:6px;font-family:var(--fh)}
+
+/* CHANNEL BAR */
+.chbar{padding:0}
+.chrow{padding:12px 16px;border-bottom:1px solid var(--b)}
+.chrow:last-child{border-bottom:none}
+.chrow-top{display:flex;justify-content:space-between;margin-bottom:6px}
+.chlabel{font-size:12.5px;color:var(--t2)}
+.chval{font-family:var(--fm);font-size:12px;font-weight:500}
+.chtrack{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.chfill{height:5px;border-radius:3px;transition:width .8s ease}
+
+/* BULK BAR */
+.bkbar{padding:11px 14px;background:var(--gd);border-top:1px solid rgba(0,214,143,.2);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bktext{font-size:12px;color:var(--g);font-weight:600}
+.bkbtn{padding:6px 14px;border-radius:6px;background:var(--g);color:#000;border:none;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--ff);transition:background .15s}
+.bkbtn:hover{background:var(--g2)}
+
+/* CHATBOT */
+.chatbot-fab{position:fixed;bottom:24px;right:24px;z-index:50;width:56px;height:56px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px var(--gg),0 0 0 0 var(--gg);animation:fabpulse 3s infinite;transition:transform .2s}
+.chatbot-fab:hover{transform:scale(1.1)}
+@keyframes fabpulse{0%,100%{box-shadow:0 4px 24px var(--gg),0 0 0 0 rgba(0,214,143,.4)}50%{box-shadow:0 4px 24px var(--gg),0 0 0 10px rgba(0,214,143,0)}}
+.chatbot-fab svg{width:26px;height:26px;stroke:#000;fill:none;stroke-width:2.2;stroke-linecap:round}
+.chatbot-fab .fab-close{display:none}
+.chatbot-fab.open .fab-open{display:none}
+.chatbot-fab.open .fab-close{display:block}
+
+.chat-window{position:fixed;bottom:92px;right:24px;width:370px;max-height:560px;z-index:49;background:var(--bg2);border:1px solid var(--b2);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden;transform:scale(.9) translateY(20px);opacity:0;pointer-events:none;transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.chat-window.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+.chat-head{padding:14px 16px;background:var(--bg3);border-bottom:1px solid var(--b);display:flex;align-items:center;gap:10px;position:relative}
+.chat-head::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--cy))}
+.chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--gd);border:1.5px solid rgba(0,214,143,.3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.chat-info-name{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t)}
+.chat-info-status{font-size:10.5px;color:var(--g);display:flex;align-items:center;gap:4px}
+.chat-info-status::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--g);box-shadow:0 0 4px var(--g)}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:240px;max-height:360px}
+.msg{max-width:88%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.55;animation:msgIn .2s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.bot{background:var(--bg3);border:1px solid var(--b);color:var(--t2);align-self:flex-start;border-bottom-left-radius:3px}
+.msg.user{background:var(--g);color:#000;align-self:flex-end;font-weight:500;border-bottom-right-radius:3px}
+.msg.thinking{background:var(--bg3);border:1px solid var(--b);align-self:flex-start;padding:12px 16px}
+.dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--t3);margin:0 2px;animation:bounce .9s infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+.qbtn{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:none;color:var(--t3);font-size:11.5px;font-weight:600;cursor:pointer;font-family:var(--ff);transition:all .15s}
+.qbtn:hover{border-color:var(--g);color:var(--g);background:var(--gd)}
+.chat-input-row{padding:10px 12px;border-top:1px solid var(--b);display:flex;gap:8px;align-items:flex-end}
+.chat-inp{flex:1;padding:9px 12px;border:1px solid var(--b2);border-radius:20px;background:var(--bg3);color:var(--t);font-size:13px;font-family:var(--ff);outline:none;resize:none;line-height:1.4;max-height:100px;transition:border-color .15s}
+.chat-inp:focus{border-color:var(--g)}
+.chat-send{width:36px;height:36px;border-radius:50%;background:var(--g);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.chat-send:hover{background:var(--g2)}
+.chat-send svg{width:16px;height:16px;stroke:#000;fill:none;stroke-width:2.5;stroke-linecap:round}
+
+/* ANALYTICS */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fw{grid-column:1/-1}
+.statlist{padding:0}
+.si{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--b)}
+.si:last-child{border-bottom:none}
+.sl{font-size:13px;color:var(--t2)}
+.sv{font-family:var(--fm);font-size:13px;font-weight:500}
+.sv.g{color:var(--g)}.sv.r{color:var(--r)}.sv.b{color:var(--bl)}
+.prow{padding:13px 18px;border-bottom:1px solid var(--b)}
+.prow:last-child{border-bottom:none}
+.ptop{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12.5px}
+.plabel{color:var(--t2)}
+.pval{font-weight:600;font-family:var(--fm)}
+.ptrack{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.pfill{height:5px;border-radius:3px;transition:width 1s ease}
+.wchart{padding:18px 18px 10px;display:flex;align-items:flex-end;gap:9px;height:120px}
+.wbg{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.wbs{width:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;height:85px}
+.wb{border-radius:3px 3px 0 0}
+.wbd{font-size:9.5px;color:var(--t3);font-family:var(--fh);font-weight:700;letter-spacing:.04em}
+.cleg{display:flex;gap:14px;padding:0 18px 14px;border-bottom:1px solid var(--b)}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t3)}
+.legsq{width:9px;height:9px;border-radius:2px}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--b2);border-radius:16px;width:600px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.7);transform:translateY(14px) scale(.97);transition:transform .25s,opacity .25s;opacity:0;position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--bl),var(--p));border-radius:16px 16px 0 0;pointer-events:none}
+.ov.open .modal{transform:translateY(0) scale(1);opacity:1}
+.mh{padding:22px 24px 16px;border-bottom:1px solid var(--b);display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.mt{font-family:var(--fh);font-size:16px;font-weight:700}
+.msub{font-size:12px;color:var(--t3);margin-top:2px}
+.mclose{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--b);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:18px;flex-shrink:0;transition:all .15s;line-height:1}
+.mclose:hover{background:var(--bg4);color:var(--t)}
+.mb{padding:22px 24px}
+.stitle{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:9px;font-family:var(--fh)}
+.risk-hero{display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg3);border-radius:var(--rr);border:1px solid var(--b);margin-bottom:16px}
+.ring{width:68px;height:68px;flex-shrink:0;position:relative}
+.ring svg{width:68px;height:68px;transform:rotate(-90deg)}
+.rtrack{fill:none;stroke:var(--bg4);stroke-width:6}
+.rfill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .9s ease}
+.rlabel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rnum{font-family:var(--fh);font-size:17px;font-weight:800;line-height:1}
+.rtxt{font-size:8.5px;color:var(--t3);letter-spacing:.05em;font-family:var(--fh);font-weight:700;text-transform:uppercase}
+.rlevel{font-family:var(--fh);font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+.rreason{font-size:12.5px;color:var(--t2);line-height:1.6}
+.factors{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:15px}
+.fc{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:16px;font-family:var(--fh)}
+.fc.r{background:var(--rd);color:var(--r);border:1px solid rgba(255,77,106,.2)}
+.fc.a{background:var(--ad);color:var(--a);border:1px solid rgba(255,176,32,.2)}
+.fc.g{background:var(--gd);color:var(--g);border:1px solid rgba(0,214,143,.2)}
+.ltabs{display:flex;gap:5px;margin-bottom:9px;flex-wrap:wrap}
+.ltab{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid var(--b2);background:var(--bg3);color:var(--t3);cursor:pointer;font-family:var(--ff);transition:all .15s}
+.ltab.active{background:var(--gd);color:var(--g);border-color:rgba(0,214,143,.3)}
+.mprev{font-size:12.5px;color:var(--t2);background:var(--bg3);border-radius:var(--rsm);padding:13px 15px;line-height:1.65;border:1px solid var(--b);font-family:var(--fm);min-height:78px;margin-bottom:16px}
+
+/* Phone input */
+.phone-row{display:flex;gap:8px;margin-bottom:16px;align-items:flex-end}
+.ph-grp{flex:1;display:flex;flex-direction:column;gap:4px}
+.ph-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;font-family:var(--fh)}
+.ph-inp{width:100%;padding:9px 12px;border:1px solid var(--b2);border-radius:var(--rsm);font-size:13px;font-family:var(--fm);background:var(--bg3);color:var(--t);outline:none;transition:border-color .15s}
+.ph-inp:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gd)}
+
+.chgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
+.chcard{padding:11px;border:1px solid var(--b);border-radius:var(--rsm);background:var(--bg3);cursor:pointer;text-align:center;transition:all .15s}
+.chcard:hover{border-color:var(--b2);background:var(--bg4)}
+.chcard.sel{border-color:rgba(0,214,143,.4);background:var(--gd)}
+.chico{font-size:20px;margin-bottom:4px}
+.chnm{font-size:11.5px;font-weight:700;font-family:var(--fh)}
+.chds{font-size:10px;color:var(--t3);margin-top:1px}
+.chai{font-size:9px;color:var(--g);font-weight:700;margin-top:3px;font-family:var(--fh)}
+.sendbtn{width:100%;padding:13px;border-radius:var(--rsm);background:var(--g);color:#000;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--fh);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;box-shadow:0 0 18px var(--gg);letter-spacing:.02em}
+.sendbtn:hover{background:var(--g2);box-shadow:0 0 28px var(--gg)}
+.sendbtn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+.sendbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round}
+.wa-result{padding:12px 14px;border-radius:var(--rsm);margin-top:12px;font-size:12.5px;font-family:var(--fm);display:none;border:1px solid}
+.wa-result.ok{background:rgba(37,211,102,.1);color:#25d366;border-color:rgba(37,211,102,.3)}
+.wa-result.err{background:var(--rd);color:var(--r);border-color:rgba(255,77,106,.3)}
+
+/* FORM */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.fgrp{display:flex;flex-direction:column;gap:4px}
+.flbl{font-size:9.5px;font-weight:700;color:var(--t3);letter-spacing:.06em;text-transform:uppercase;font-family:var(--fh)}
+.finp{padding:8px 11px;border:1px solid var(--b2);border-radius:var(--rsm);font-size:13px;font-family:var(--ff);background:var(--bg3);color:var(--t);outline:none;transition:border-color .15s;-webkit-appearance:none}
+.finp:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--gd)}
+option{background:var(--bg3)}
+
+/* SPINNER / SHIMMER */
+.spinner{width:13px;height:13px;border:2px solid var(--b2);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.shim{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:4px;height:11px}
+@keyframes shim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:380px;display:flex;align-items:center;gap:9px;font-family:var(--fh);border:1px solid;backdrop-filter:blur(10px);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.ok{background:rgba(0,214,143,.15);color:var(--g);border-color:rgba(0,214,143,.3)}
+.toast.info{background:rgba(77,159,255,.15);color:var(--bl);border-color:rgba(77,159,255,.3)}
+.toast.err{background:var(--rd);color:var(--r);border-color:rgba(255,77,106,.3)}
+.toast.wa{background:rgba(37,211,102,.15);color:#25d366;border-color:rgba(37,211,102,.3)}
+.toast svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;flex-shrink:0}
+
+/* Entrance animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.mc{animation:fadeUp .4s ease both}
+.mc:nth-child(1){animation-delay:.04s}.mc:nth-child(2){animation-delay:.08s}
+.mc:nth-child(3){animation-delay:.12s}.mc:nth-child(4){animation-delay:.16s}.mc:nth-child(5){animation-delay:.2s}
+
+/* Responsive */
+@media(max-width:1100px){.metrics{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.app{grid-template-columns:1fr}.sb{display:none}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ─── SIDEBAR ─── -->
+<aside class="sb">
+  <div class="logo-area">
+    <div class="logo-row">
+      <div class="logo-ico"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+      <div><div class="logo-n">CareLink Pro</div><div class="logo-t">Intelligent Patient Continuity</div></div>
+    </div>
+    <div class="clinic-pill">
+      <div class="cpulse"></div>
+      <div><div class="cname">Nairobi Central Clinic</div><div class="ctime" id="liveTime">--:--:-- EAT</div></div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <div class="ns">Main</div>
+    <div class="ni active" onclick="sv('dashboard',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</div>
+    <div class="ni" onclick="sv('analytics',this)"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analytics<span class="nbadge g">Live</span></div>
+    <div class="ni" onclick="sv('reminders',this)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Reminders<span class="nbadge" id="pendBadge">0</span></div>
+    <div class="ns">Patients</div>
+    <div class="ni" onclick="sv('dashboard',this)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Patient Queue</div>
+    <div class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Appointments</div>
+    <div class="ns">Integrations</div>
+    <div class="ni"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 21 16z"/></svg>WhatsApp API<span class="nbadge b" id="waBadge">?</span></div>
+    <div class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>Gemini AI</div>
+  </nav>
+
+  <div class="cfg">
+    <div class="cfg-title">🔐 API Configuration</div>
+    <div class="cfg-row">
+      <div class="cfg-lbl">Gemini Key</div>
+      <input class="cfg-inp" type="password" id="gemKey" placeholder="AIzaSy…" oninput="updateStatus()"/>
+      <div class="cfg-status"><div class="cfg-dot" id="gemDot"></div><span id="gemTxt" style="font-size:10.5px">Enter key</span></div>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-lbl">WA Phone Number ID</div>
+      <input class="cfg-inp" type="text" id="waPhoneId" placeholder="12345678901234" oninput="updateStatus()"/>
+    </div>
+    <div class="cfg-row">
+      <div class="cfg-lbl">WA Access Token</div>
+      <input class="cfg-inp" type="password" id="waToken" placeholder="EAABs…" oninput="updateStatus()"/>
+      <div class="cfg-status"><div class="cfg-dot" id="waDot"></div><span id="waTxt" style="font-size:10.5px">Enter WA credentials</span></div>
+    </div>
+    <div class="model-tag"><span>gemini-2.0-flash</span> · <span>WhatsApp Cloud API</span></div>
+  </div>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="vtabs">
+        <button class="vtab active" id="tab-dashboard" onclick="sv('dashboard',null)">Dashboard</button>
+        <button class="vtab" id="tab-analytics" onclick="sv('analytics',null)">Analytics</button>
+        <button class="vtab" id="tab-reminders" onclick="sv('reminders',null)">Reminders</button>
+      </div>
+    </div>
+    <div class="tr">
+      <button class="btn" onclick="openAdd()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Patient</button>
+      <button class="btn prim" id="triageBtn" onclick="triageAll()"><svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Run AI Triage</button>
+    </div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <div id="v-dashboard" class="content">
+    <div class="metrics">
+      <div class="mc mg"><div class="ml">Appointments</div><div class="mv g" id="m-tot">7</div><div class="ms">Today's queue</div></div>
+      <div class="mc mr"><div class="ml">No-Show Rate</div><div class="mv r">12%</div><div class="ms up">↓ 57% vs last month</div></div>
+      <div class="mc ma"><div class="ml">High Risk</div><div class="mv a" id="m-risk">0</div><div class="ms dn" id="m-risksub">Needs triage</div></div>
+      <div class="mc mb"><div class="ml">WA Sent</div><div class="mv b" id="m-sent">0</div><div class="ms">Real WhatsApp msgs</div></div>
+      <div class="mc mp"><div class="ml">Confirmed</div><div class="mv p" id="m-conf">2</div><div class="ms up">Patient responses</div></div>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <div class="ph">
+          <div><div class="pt"><span class="dot" style="background:var(--g)"></span>Patient Queue</div><div class="psub">AI risk scoring + real WhatsApp reminders</div></div>
+          <div class="pact"><button class="btn" style="font-size:11.5px;padding:5px 11px" onclick="openAdd()">+ Add</button></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr><th>Patient</th><th>Time</th><th>AI Risk</th><th>Status</th><th>Phone</th><th>Actions</th></tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="rc">
+        <!-- Reminders feed -->
+        <div class="panel">
+          <div class="ph"><div><div class="pt"><span class="dot" style="background:var(--bl)"></span>AI Reminders</div><div class="psub">Gemini-generated · Sent via WhatsApp</div></div></div>
+          <div class="rfeed" id="rfeed">
+            <div style="padding:28px 16px;text-align:center;color:var(--t3);font-size:13px" id="rfeedEmpty">
+              <div style="font-size:26px;opacity:.2;margin-bottom:8px">✦</div>
+              Run AI Triage to generate reminders
+            </div>
+          </div>
+          <div class="bkbar" id="bkbar" style="display:none">
+            <span class="bktext" id="bktext">0 ready</span>
+            <button class="bkbtn" onclick="sendAll()">Send All via WA ↗</button>
+          </div>
+        </div>
+
+        <!-- Channel stats -->
+        <div class="panel">
+          <div class="ph"><div class="pt"><span class="dot" style="background:var(--a)"></span>Channel Stats</div></div>
+          <div class="chbar">
+            <div class="chrow"><div class="chrow-top"><span class="chlabel">WhatsApp</span><span class="chval" id="ch-wa">0 sent</span></div><div class="chtrack"><div class="chfill" id="ch-wa-b" style="width:0%;background:#25d366"></div></div></div>
+            <div class="chrow"><div class="chrow-top"><span class="chlabel">SMS fallback</span><span class="chval" id="ch-sms">0 sent</span></div><div class="chtrack"><div class="chfill" id="ch-sms-b" style="width:0%;background:var(--bl)"></div></div></div>
+            <div class="chrow"><div class="chrow-top"><span class="chlabel">Auto-call</span><span class="chval" id="ch-call">0 sent</span></div><div class="chtrack"><div class="chfill" id="ch-call-b" style="width:0%;background:var(--a)"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div id="v-analytics" class="content" style="display:none">
+    <div class="ag">
+      <div class="panel">
+        <div class="ph"><div class="pt"><span class="dot" style="background:var(--g)"></span>Weekly Attendance</div></div>
+        <div class="wchart">
+          <div class="wbg"><div class="wbs"><div class="wb" style="height:40px;background:var(--g);opacity:.8"></div><div class="wb" style="height:14px;background:var(--r);opacity:.7"></div></div><div class="wbd">MON</div></div>
+          <div class="wbg"><div class="wbs"><div class="wb" style="height:55px;background:var(--g);opacity:.8"></div><div class="wb" style="height:8px;background:var(--r);opacity:.7"></div></div><div class="wbd">TUE</div></div>
+          <div class="wbg"><div class="wbs"><div class="wb" style="height:36px;background:var(--g);opacity:.8"></div><div class="wb" style="height:18px;background:var(--r);opacity:.7"></div></div><div class="wbd">WED</div></div>
+          <div class="wbg"><div class="wbs"><div class="wb" style="height:50px;background:var(--g);opacity:.8"></div><div class="wb" style="height:7px;background:var(--r);opacity:.7"></div></div><div class="wbd">THU</div></div>
+          <div class="wbg"><div class="wbs"><div class="wb" style="height:44px;background:var(--g);opacity:.8"></div><div class="wb" style="height:5px;background:var(--r);opacity:.7"></div></div><div class="wbd">FRI</div></div>
+        </div>
+        <div class="cleg"><div class="leg"><div class="legsq" style="background:var(--g)"></div>Attended</div><div class="leg"><div class="legsq" style="background:var(--r)"></div>No-show</div></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div class="pt"><span class="dot" style="background:var(--r)"></span>No-Show Reduction</div></div>
+        <div class="statlist">
+          <div class="si"><span class="sl">This week</span><span class="sv g">12%</span></div>
+          <div class="si"><span class="sl">Last month avg</span><span class="sv r">28%</span></div>
+          <div class="si"><span class="sl">Reduction</span><span class="sv g">↓ 57%</span></div>
+          <div class="si"><span class="sl">Target goal</span><span class="sv">≤ 14%</span></div>
+          <div class="si"><span class="sl">WA response rate</span><span class="sv g">73%</span></div>
+          <div class="si"><span class="sl">Avg reminder lead</span><span class="sv">24h prior</span></div>
+        </div>
+      </div>
+      <div class="panel fw">
+        <div class="ph"><div class="pt"><span class="dot" style="background:var(--bl)"></span>Reminder Effectiveness by Channel</div></div>
+        <div class="prow"><div class="ptop"><span class="plabel">WhatsApp (primary)</span><span class="pval" style="color:var(--g)">82%</span></div><div class="ptrack"><div class="pfill" style="width:82%;background:var(--g)"></div></div></div>
+        <div class="prow"><div class="ptop"><span class="plabel">SMS fallback</span><span class="pval" style="color:var(--bl)">64%</span></div><div class="ptrack"><div class="pfill" style="width:64%;background:var(--bl)"></div></div></div>
+        <div class="prow"><div class="ptop"><span class="plabel">Auto-call (elderly / offline)</span><span class="pval" style="color:var(--a)">51%</span></div><div class="ptrack"><div class="pfill" style="width:51%;background:var(--a)"></div></div></div>
+        <div class="prow"><div class="ptop"><span class="plabel">Multilingual vs English-only</span><span class="pval" style="color:var(--p)">+38% engagement</span></div><div class="ptrack"><div class="pfill" style="width:78%;background:var(--p)"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REMINDERS -->
+  <div id="v-reminders" class="content" style="display:none">
+    <div class="panel">
+      <div class="ph"><div><div class="pt"><span class="dot" style="background:var(--bl)"></span>All Generated Reminders</div><div class="psub">Multilingual · WhatsApp-ready</div></div></div>
+      <div id="allRem"><div style="padding:40px;text-align:center;color:var(--t3)">No reminders yet. Run AI Triage from the Dashboard.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ─── TRIAGE MODAL ─── -->
+<div class="ov" id="triageOv">
+  <div class="modal">
+    <div class="mh"><div><div class="mt" id="mTitle">AI Triage</div><div class="msub" id="mSub">Powered by Gemini 2.0 Flash</div></div><button class="mclose" onclick="closeMod()">×</button></div>
+    <div class="mb" id="mBody"></div>
+  </div>
+</div>
+
+<!-- ─── ADD PATIENT MODAL ─── -->
+<div class="ov" id="addOv">
+  <div class="modal">
+    <div class="mh"><div><div class="mt">Add New Patient</div><div class="msub">Schedule appointment + queue for AI triage</div></div><button class="mclose" onclick="closeAdd()">×</button></div>
+    <div class="mb">
+      <div class="fg">
+        <div class="fgrp"><label class="flbl">Full Name</label><input class="finp" id="f-name" placeholder="e.g. Mary Akinyi"/></div>
+        <div class="fgrp"><label class="flbl">Phone (254…)</label><input class="finp" id="f-phone" placeholder="254712345678" type="tel"/></div>
+        <div class="fgrp"><label class="flbl">Appt. Time</label><input class="finp" id="f-time" type="time" value="09:00"/></div>
+        <div class="fgrp"><label class="flbl">Appointment Type</label><select class="finp" id="f-type"><option>General checkup</option><option>Follow-up</option><option>Prenatal</option><option>Cardiology</option><option>Dental</option><option>Consultation</option><option>Paediatrics</option></select></div>
+        <div class="fgrp"><label class="flbl">Language</label><select class="finp" id="f-lang"><option>English</option><option>Swahili</option><option>Kikuyu</option><option>Luo</option><option>Kamba</option></select></div>
+        <div class="fgrp"><label class="flbl">Past No-Shows</label><select class="finp" id="f-ns"><option value="0">0 — none</option><option value="1">1</option><option value="2">2</option><option value="3">3+</option></select></div>
+        <div class="fgrp"><label class="flbl">Condition Severity</label><select class="finp" id="f-sev"><option>Low</option><option>Medium</option><option>High</option><option>Critical</option></select></div>
+      </div>
+      <button class="sendbtn" onclick="addPatient()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add to Queue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHATBOT ─── -->
+<button class="chatbot-fab" id="fab" onclick="toggleChat()">
+  <svg class="fab-open" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <svg class="fab-close" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+</button>
+
+<div class="chat-window" id="chatWin">
+  <div class="chat-head">
+    <div class="chat-avatar">🏥</div>
+    <div>
+      <div class="chat-info-name">CareLink AI Assistant</div>
+      <div class="chat-info-status">Online · Gemini 2.0 Flash</div>
+    </div>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="msg bot">👋 Hello! I'm CareLink's AI assistant. I can help you with patient triage, send WhatsApp reminders, answer questions about your clinic's no-show rates, and more. What do you need?</div>
+  </div>
+  <div class="chat-quick" id="quickBtns">
+    <button class="qbtn" onclick="qsend('Show high-risk patients')">🔴 High-risk patients</button>
+    <button class="qbtn" onclick="qsend('How many reminders sent today?')">📊 Today\'s stats</button>
+    <button class="qbtn" onclick="qsend('What is the no-show rate this week?')">📉 No-show rate</button>
+    <button class="qbtn" onclick="qsend('Send reminders to all pending patients')">📤 Send all reminders</button>
+  </div>
+  <div class="chat-input-row">
+    <textarea class="chat-inp" id="chatInp" rows="1" placeholder="Ask anything about your patients…" onkeydown="chatKey(event)"></textarea>
+    <button class="chat-send" onclick="chatSend()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+  </div>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div class="toast" id="toast"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span id="toastMsg"></span></div>
+
+<script>
+// ─── PATIENT DATA ───
+let patients=[
+  {id:1,name:'Amina Wanjiku',  init:'AW',phone:'254712345001',time:'08:30',type:'Follow-up',    lang:'Swahili',ns:2,sev:'High',    risk:null,score:null,status:'pending', ch:'WhatsApp',waSent:false,msgs:null},
+  {id:2,name:'James Otieno',   init:'JO',phone:'254712345002',time:'09:00',type:'Consultation', lang:'English',ns:0,sev:'Low',     risk:null,score:null,status:'confirmed',ch:'WhatsApp',waSent:false,msgs:null},
+  {id:3,name:'Fatuma Kimani',  init:'FK',phone:'254712345003',time:'10:15',type:'Prenatal',     lang:'Swahili',ns:1,sev:'High',    risk:null,score:null,status:'pending', ch:'SMS',     waSent:false,msgs:null},
+  {id:4,name:'Peter Mwangi',   init:'PM',phone:'254712345004',time:'11:00',type:'Cardiology',   lang:'English',ns:3,sev:'Critical',risk:null,score:null,status:'overdue', ch:'WhatsApp',waSent:false,msgs:null},
+  {id:5,name:'Grace Njeri',    init:'GN',phone:'254712345005',time:'12:30',type:'Dental',       lang:'Kikuyu', ns:0,sev:'Low',     risk:null,score:null,status:'sent',    ch:'SMS',     waSent:false,msgs:null},
+  {id:6,name:'David Kipchoge', init:'DK',phone:'254712345006',time:'14:00',type:'Follow-up',    lang:'English',ns:1,sev:'Medium',  risk:null,score:null,status:'confirmed',ch:'WhatsApp',waSent:false,msgs:null},
+  {id:7,name:'Ruth Odhiambo',  init:'RO',phone:'254712345007',time:'15:30',type:'General checkup',lang:'English',ns:2,sev:'Medium',risk:null,score:null,status:'pending',ch:'Auto-call',waSent:false,msgs:null},
+];
+let nxtId=8,waCount=0,smsCount=0,callCount=0,totalSent=0;
+const AVC=[
+  {bg:'rgba(0,214,143,.15)',fg:'var(--g)',bd:'rgba(0,214,143,.3)'},
+  {bg:'rgba(77,159,255,.15)',fg:'var(--bl)',bd:'rgba(77,159,255,.3)'},
+  {bg:'rgba(255,176,32,.15)',fg:'var(--a)',bd:'rgba(255,176,32,.3)'},
+  {bg:'rgba(255,77,106,.15)',fg:'var(--r)',bd:'rgba(255,77,106,.3)'},
+  {bg:'rgba(167,139,250,.15)',fg:'var(--p)',bd:'rgba(167,139,250,.3)'},
+];
+
+// ─── TIME ───
+setInterval(()=>{document.getElementById('liveTime').textContent=new Date().toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' EAT'},1000);
+
+// ─── CONFIG STATUS ───
+function gKey(){return document.getElementById('gemKey').value.trim()}
+function waPhId(){return document.getElementById('waPhoneId').value.trim()}
+function waTok(){return document.getElementById('waToken').value.trim()}
+function updateStatus(){
+  const gk=gKey();
+  document.getElementById('gemDot').className='cfg-dot'+(gk.length>10?' on':'');
+  document.getElementById('gemTxt').textContent=gk.length>10?'Gemini connected':'Enter key';
+  document.getElementById('gemTxt').style.color=gk.length>10?'var(--g)':'var(--t3)';
+  const wa=waPhId()&&waTok();
+  document.getElementById('waDot').className='cfg-dot'+(wa?' on':'');
+  document.getElementById('waTxt').textContent=wa?'WhatsApp ready':'Enter credentials';
+  document.getElementById('waTxt').style.color=wa?'#25d366':'var(--t3)';
+  document.getElementById('waBadge').textContent=wa?'✓':'!';
+  document.getElementById('waBadge').style.background=wa?'#25d366':'var(--r)';
+}
+
+// ─── VIEWS ───
+function sv(v,navEl){
+  ['dashboard','analytics','reminders'].forEach(x=>{
+    document.getElementById('v-'+x).style.display=x===v?'block':'none';
+    document.getElementById('tab-'+x).classList.toggle('active',x===v);
+  });
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  if(navEl) navEl.classList.add('active');
+}
+
+// ─── RENDER ───
+function render(){
+  const high=patients.filter(p=>p.risk==='High').length;
+  const conf=patients.filter(p=>p.status==='confirmed').length;
+  const pend=patients.filter(p=>p.status==='pending'||p.status==='overdue').length;
+  document.getElementById('m-tot').textContent=patients.length;
+  document.getElementById('m-risk').textContent=high;
+  document.getElementById('m-risksub').textContent=high?`${high} flagged`:'None flagged';
+  document.getElementById('m-sent').textContent=totalSent;
+  document.getElementById('m-conf').textContent=conf;
+  document.getElementById('pendBadge').textContent=pend;
+  const tot=Math.max(totalSent,1);
+  document.getElementById('ch-wa').textContent=waCount+' sent';
+  document.getElementById('ch-sms').textContent=smsCount+' sent';
+  document.getElementById('ch-call').textContent=callCount+' sent';
+  document.getElementById('ch-wa-b').style.width=Math.round(waCount/tot*100)+'%';
+  document.getElementById('ch-sms-b').style.width=Math.round(smsCount/tot*100)+'%';
+  document.getElementById('ch-call-b').style.width=Math.round(callCount/tot*100)+'%';
+
+  document.getElementById('tbody').innerHTML=patients.map((p,i)=>{
+    const ac=AVC[i%AVC.length];
+    const rB=p.risk?`<span class="badge ${p.risk==='High'?'bh':p.risk==='Medium'?'bm':'bl2'}">${p.risk}</span>`:'<span class="badge bn">–</span>';
+    const sc=p.score!=null?`<div class="sbar"><div class="sbf" style="width:${p.score}%;background:${p.score>66?'var(--r)':p.score>33?'var(--a)':'var(--g)'}"></div></div><span class="score-n" style="color:${p.score>66?'var(--r)':p.score>33?'var(--a)':'var(--g)'}">${p.score}</span>`:'-';
+    const stM={pending:'bp',sent:'bs',confirmed:'bc',overdue:'bo'};
+    const stL={pending:'Pending',sent:'Sent',confirmed:'Confirmed',overdue:'Overdue'};
+    const waBtn=p.msgs&&!p.waSent?`<button class="rbtn wa" onclick="sendWA(${p.id})" title="Send via WhatsApp">📲 WA</button>`:'';
+    const mainBtn=p.waSent?`<button class="rbtn sent" onclick="viewR(${p.id})">View</button>`:`<button class="rbtn ai" onclick="openTriage(${p.id})">✦ Triage</button>`;
+    return `<tr>
+      <td><div class="pcell"><div class="av" style="background:${ac.bg};color:${ac.fg};border-color:${ac.bd}">${p.init}</div><div><div class="pn">${p.name}</div><div class="pt2">${p.type}</div></div></div></td>
+      <td style="font-family:var(--fm);font-size:12px;color:var(--t2)">${p.time}</td>
+      <td><div class="score-cell">${rB}<div style="display:flex;align-items:center;gap:5px;margin-top:3px">${sc}</div></div></td>
+      <td><span class="badge ${stM[p.status]||''}">${stL[p.status]||p.status}</span>${p.waSent?'<span class="wa-sent-tag" style="font-size:9px;margin-left:4px">✓WA</span>':''}</td>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--t3)">${p.phone||'—'}</td>
+      <td><div style="display:flex;gap:5px">${mainBtn}${waBtn}</div></td>
+    </tr>`;
+  }).join('');
+
+  const ready=patients.filter(p=>p.msgs&&!p.waSent).length;
+  document.getElementById('bkbar').style.display=ready?'flex':'none';
+  if(ready) document.getElementById('bktext').textContent=`${ready} reminder${ready>1?'s':''} ready`;
+  refreshAllRem();
+}
+
+// ─── GEMINI CALL ───
+async function callGemini(prompt){
+  const k=gKey(); if(!k) throw new Error('No Gemini API key');
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:.7,maxOutputTokens:1400}})
+  });
+  if(!res.ok){const e=await res.json();throw new Error(e.error?.message||'Gemini error')}
+  const d=await res.json();
+  return d.candidates[0].content.parts[0].text;
+}
+
+// ─── WHATSAPP SEND ───
+async function sendWAMessage(phone,message,patientName){
+  const phId=waPhId(); const tok=waTok();
+  if(!phId||!tok) throw new Error('WhatsApp credentials not configured in sidebar');
+  const clean=phone.replace(/[^0-9]/g,'');
+  const res=await fetch(`https://graph.facebook.com/v19.0/${phId}/messages`,{
+    method:'POST',
+    headers:{'Authorization':`Bearer ${tok}`,'Content-Type':'application/json'},
+    body:JSON.stringify({messaging_product:'whatsapp',to:clean,type:'text',text:{body:message}})
+  });
+  const data=await res.json();
+  if(!res.ok) throw new Error(data.error?.message||'WhatsApp API error');
+  return data;
+}
+
+// ─── TRIAGE ───
+let curP=null,curMsgs={},selLang='',selCh=0;
+
+async function openTriage(id){
+  curP=patients.find(p=>p.id===id); if(!curP) return;
+  document.getElementById('mTitle').textContent=`AI Triage — ${curP.name}`;
+  document.getElementById('mSub').textContent=`${curP.type} · ${curP.time} · ${curP.lang}`;
+  document.getElementById('mBody').innerHTML=loadHTML('Analysing patient with Gemini 2.0…');
+  document.getElementById('triageOv').classList.add('open');
+  if(!gKey()){document.getElementById('mBody').innerHTML=noKeyHTML();return}
+  try{
+    const sl=curP.lang!=='English'?curP.lang:'Swahili';
+    const prompt=`You are a clinical AI for a Kenyan clinic. Analyse and return ONLY valid JSON (no markdown):
+
+Patient: ${curP.name}
+Type: ${curP.type}, Time: ${curP.time}, Language: ${curP.lang}
+Past no-shows: ${curP.ns}, Severity: ${curP.sev}, Status: ${curP.status}
+
+JSON format:
+{
+  "risk":"High"|"Medium"|"Low",
+  "score":<0-100>,
+  "reasoning":"<2-3 sentences>",
+  "factors":["<factor1>","<factor2>","<factor3>"],
+  "recommended_channel":"WhatsApp"|"SMS"|"Auto-call",
+  "messages":{
+    "English":"<warm 2-sentence WhatsApp reminder with time, include: Confirm or reschedule: https://carelink.co.ke/r/[PATIENT_ID]>",
+    "${sl}":"<same message in ${sl}, natural tone>"
+  }
+}`;
+    const raw=await callGemini(prompt);
+    let j; try{j=JSON.parse(raw.replace(/```json|```/g,'').trim())}catch{const m=raw.match(/\{[\s\S]*\}/);j=m?JSON.parse(m[0]):null}
+    if(!j) throw new Error('Could not parse Gemini response');
+    curP.risk=j.risk; curP.score=j.score; curP.msgs=j.messages; curMsgs=j.messages;
+    const langs=Object.keys(j.messages); selLang=langs[0]; selCh=0;
+    document.getElementById('mBody').innerHTML=triageHTML(j,langs);
+    render(); addToFeed(curP,j.messages[selLang]);
+  }catch(e){document.getElementById('mBody').innerHTML=`<div style="color:var(--r);padding:12px;font-size:13px"><b>Error:</b> ${e.message}</div>`}
+}
+
+function loadHTML(msg){
+  return `<div style="display:flex;flex-direction:column;gap:12px;padding:4px 0">
+    <div style="display:flex;align-items:center;gap:9px;font-size:13px;color:var(--t3)"><div class="spinner"></div>${msg}</div>
+    <div class="shim" style="width:70%"></div><div class="shim" style="width:90%"></div><div class="shim" style="width:55%"></div>
+  </div>`;
+}
+function noKeyHTML(){return`<div style="text-align:center;padding:24px"><div style="font-size:30px;opacity:.3;margin-bottom:10px">🔑</div><div style="font-size:14px;font-weight:700;margin-bottom:6px">Gemini API Key Required</div><div style="font-size:12.5px;color:var(--t3)">Paste your key in the sidebar to enable AI triage.</div></div>`}
+
+function triageHTML(j,langs){
+  const sc=j.score; const col=sc>66?'var(--r)':sc>33?'var(--a)':'var(--g)';
+  const circ=2*Math.PI*28; const off=circ-(sc/100*circ);
+  const ltabs=langs.map((l,i)=>`<button class="ltab ${i===0?'active':''}" onclick="swL('${l}',this)">${l}</button>`).join('');
+  const fcs=(j.factors||[]).map(f=>`<span class="fc ${sc>66?'r':sc>33?'a':'g'}">${f}</span>`).join('');
+  const chs=['WhatsApp','SMS','Auto-call']; const icos=['💬','📱','📞']; const ds=['Rich + reschedule link','Low-connectivity','No-text fallback'];
+  const chCards=chs.map((c,i)=>`<div class="chcard ${c===j.recommended_channel?'sel':''}" onclick="swC(${i},this)"><div class="chico">${icos[i]}</div><div class="chnm">${c}</div><div class="chds">${ds[i]}</div>${c===j.recommended_channel?'<div class="chai">✦ AI pick</div>':''}</div>`).join('');
+  return `
+  <div class="risk-hero">
+    <div class="ring"><svg viewBox="0 0 68 68"><circle class="rtrack" cx="34" cy="34" r="28"/><circle class="rfill" cx="34" cy="34" r="28" stroke="${col}" stroke-dasharray="${circ}" stroke-dashoffset="${off}"/></svg><div class="rlabel"><span class="rnum" style="color:${col}">${sc}</span><span class="rtxt">score</span></div></div>
+    <div><div class="rlevel" style="color:${col}">${j.risk} Risk</div><div class="rreason">${j.reasoning}</div></div>
+  </div>
+  ${fcs?`<div class="stitle">Risk Factors</div><div class="factors">${fcs}</div>`:''}
+  <div class="stitle">Reminder Message</div>
+  <div class="ltabs">${ltabs}</div>
+  <div class="mprev" id="mprev">${curMsgs[selLang]||''}</div>
+  <div class="stitle">Delivery Channel</div>
+  <div class="chgrid">${chCards}</div>
+
+  <div class="ph-grp" style="margin-bottom:14px">
+    <label class="ph-lbl">Patient Phone Number (254…)</label>
+    <input class="ph-inp" id="modalPhone" value="${curP.phone||''}" placeholder="254712345678"/>
+  </div>
+
+  <button class="sendbtn" id="sendBtn" onclick="sendFromModal()">
+    <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 21 16z"/></svg>
+    Send via WhatsApp to ${curP.name.split(' ')[0]}
+  </button>
+  <div class="wa-result" id="waResult"></div>`;
+}
+
+function swL(l,el){selLang=l;document.querySelectorAll('.ltab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('mprev').textContent=curMsgs[l]||''}
+function swC(i,el){selCh=i;document.querySelectorAll('.chcard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel')}
+
+async function sendFromModal(){
+  if(!curP) return;
+  const phone=document.getElementById('modalPhone').value.trim()||curP.phone;
+  const msg=curMsgs[selLang];
+  const btn=document.getElementById('sendBtn');
+  const res=document.getElementById('waResult');
+  if(!phone){toast('Enter a phone number','err');return}
+  btn.disabled=true; btn.innerHTML='<div class="spinner" style="border-top-color:#000"></div> Sending via WhatsApp…';
+  try{
+    await sendWAMessage(phone,msg,curP.name);
+    curP.waSent=true; curP.status='sent'; curP.phone=phone;
+    if(['WhatsApp','SMS','Auto-call'][selCh]==='WhatsApp') waCount++;
+    else if(['WhatsApp','SMS','Auto-call'][selCh]==='SMS') smsCount++;
+    else callCount++;
+    totalSent++;
+    res.className='wa-result ok'; res.style.display='block';
+    res.textContent=`✅ WhatsApp message delivered to ${phone}`;
+    btn.innerHTML='✓ Sent!'; render();
+    toast(`Sent to ${curP.name.split(' ')[0]} via WhatsApp 📲`,'wa');
+    setTimeout(()=>closeMod(),2000);
+  }catch(e){
+    res.className='wa-result err'; res.style.display='block';
+    res.textContent=`❌ ${e.message}`;
+    btn.disabled=false; btn.innerHTML=`<svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.07 1h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 21 16z"/></svg>Retry WhatsApp Send`;
+    toast(`WhatsApp error: ${e.message}`,'err');
+  }
+}
+
+async function sendWA(id){
+  const p=patients.find(x=>x.id===id); if(!p||!p.msgs) return;
+  if(!p.phone){toast('No phone number. Run triage first.','err');return}
+  const msg=Object.values(p.msgs)[0];
+  try{
+    await sendWAMessage(p.phone,msg,p.name);
+    p.waSent=true; p.status='sent'; waCount++; totalSent++;
+    render(); toast(`📲 Sent to ${p.name.split(' ')[0]}`,'wa');
+  }catch(e){toast(`WA error: ${e.message}`,'err')}
+}
+
+async function sendAll(){
+  const ready=patients.filter(p=>p.msgs&&!p.waSent);
+  if(!ready.length){toast('No reminders ready','info');return}
+  if(!waPhId()||!waTok()){toast('Configure WhatsApp credentials in sidebar','err');return}
+  toast(`Sending ${ready.length} WhatsApp messages…`,'info');
+  for(const p of ready){
+    try{
+      await sendWAMessage(p.phone,Object.values(p.msgs)[0],p.name);
+      p.waSent=true; p.status='sent'; waCount++; totalSent++;
+      await new Promise(r=>setTimeout(r,500));
+    }catch(e){toast(`Failed: ${p.name} — ${e.message}`,'err')}
+  }
+  render(); toast(`All reminders sent via WhatsApp! 📲`,'wa');
+}
+
+async function triageAll(){
+  if(!gKey()){toast('Add Gemini API key in sidebar','err');return}
+  const pending=patients.filter(p=>!p.risk);
+  if(!pending.length){toast('All patients already triaged','info');return}
+  document.getElementById('triageBtn').disabled=true;
+  toast(`Triaging ${pending.length} patients…`,'info');
+  for(const p of pending){await openTriage(p.id);await new Promise(r=>setTimeout(r,700));closeMod()}
+  document.getElementById('triageBtn').disabled=false;
+  toast('All patients triaged ✓','ok');
+}
+
+function viewR(id){
+  const p=patients.find(x=>x.id===id); if(!p||!p.msgs) return;
+  document.getElementById('mTitle').textContent=`Reminder — ${p.name}`;
+  document.getElementById('mSub').textContent='Sent via WhatsApp ✓';
+  const langs=Object.keys(p.msgs);
+  const tabs=langs.map((l,i)=>`<button class="ltab ${i===0?'active':''}" onclick="swLv('${l}',this,${id})">${l}</button>`).join('');
+  document.getElementById('mBody').innerHTML=`<div class="stitle">Message</div><div class="ltabs">${tabs}</div><div class="mprev" id="mprevv">${p.msgs[langs[0]]}</div><span class="badge bwa" style="margin-top:8px;display:inline-flex">✓ Sent via WhatsApp to ${p.phone}</span>`;
+  document.getElementById('triageOv').classList.add('open');
+}
+function swLv(l,el,id){const p=patients.find(x=>x.id===id);if(!p)return;document.querySelectorAll('.ltab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.getElementById('mprevv').textContent=p.msgs[l]||''}
+
+// ─── FEED ───
+function addToFeed(p,msg){
+  const feed=document.getElementById('rfeed');
+  const empty=document.getElementById('rfeedEmpty');
+  if(empty) empty.remove();
+  const ac=AVC[patients.indexOf(p)%AVC.length];
+  const chCls={'WhatsApp':'bwa','SMS':'bp','Auto-call':'bm'}[p.ch]||'bp';
+  const div=document.createElement('div');
+  div.className='rcard';
+  div.innerHTML=`<div class="rcard-top"><div class="rname" style="display:flex;align-items:center;gap:7px"><div class="av" style="width:26px;height:26px;font-size:9px;background:${ac.bg};color:${ac.fg};border-color:${ac.bd}">${p.init}</div>${p.name}</div><span class="rtime">${p.time}</span></div>
+  <span class="langchip">${p.lang} · ${p.ch}</span>
+  <div class="mbubble">${msg}</div>
+  ${p.waSent?'<div class="wa-sent-tag">📲 Delivered via WhatsApp</div>':''}`;
+  feed.insertBefore(div,feed.firstChild);
+}
+function refreshAllRem(){
+  const ar=document.getElementById('allRem');
+  const triaged=patients.filter(p=>p.msgs);
+  if(!triaged.length){ar.innerHTML='<div style="padding:40px;text-align:center;color:var(--t3)">No reminders yet.</div>';return}
+  ar.innerHTML=triaged.map(p=>{
+    const ac=AVC[patients.indexOf(p)%AVC.length];
+    return `<div class="rcard"><div class="rcard-top"><div class="rname" style="display:flex;align-items:center;gap:9px"><div class="av" style="background:${ac.bg};color:${ac.fg};border-color:${ac.bd}">${p.init}</div><div><div>${p.name}</div><div class="pt2">${p.type}</div></div></div><span class="badge ${p.risk==='High'?'bh':p.risk==='Medium'?'bm':'bl2'}">${p.risk}</span></div><span class="langchip">${p.lang} · ${p.ch}</span><div class="mbubble">${Object.values(p.msgs)[0]}</div>${p.waSent?'<div class="wa-sent-tag">📲 Sent via WhatsApp to '+p.phone+'</div>':'<div style="font-size:11px;color:var(--t3);margin-top:5px">Not yet sent</div>'}</div>`;
+  }).join('');
+}
+
+// ─── ADD PATIENT ───
+function openAdd(){document.getElementById('addOv').classList.add('open')}
+function closeAdd(){document.getElementById('addOv').classList.remove('open')}
+function addPatient(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){toast('Enter patient name','err');return}
+  const init=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  patients.push({id:nxtId++,name,init,phone:document.getElementById('f-phone').value.trim(),
+    time:document.getElementById('f-time').value,type:document.getElementById('f-type').value,
+    lang:document.getElementById('f-lang').value,ns:+document.getElementById('f-ns').value,
+    sev:document.getElementById('f-sev').value,risk:null,score:null,status:'pending',
+    ch:'WhatsApp',waSent:false,msgs:null});
+  closeAdd(); render(); toast(`${name} added to queue`,'ok');
+  document.getElementById('f-name').value=''; document.getElementById('f-phone').value='';
+}
+
+// ─── CHATBOT ───
+let chatOpen=false;
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chatWin').classList.toggle('open',chatOpen);
+  document.getElementById('fab').classList.toggle('open',chatOpen);
+}
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();chatSend()}}
+function qsend(msg){document.getElementById('chatInp').value=msg;chatSend()}
+
+async function chatSend(){
+  const inp=document.getElementById('chatInp');
+  const msg=inp.value.trim(); if(!msg) return;
+  inp.value='';
+  addChatMsg(msg,'user');
+  document.getElementById('quickBtns').style.display='none';
+  const thinkEl=addChatMsg('','thinking');
+
+  const context=buildContext();
+  const prompt=`You are CareLink AI, an intelligent assistant for a Kenyan health clinic patient continuity system.
+
+Current clinic data:
+${context}
+
+User question: "${msg}"
+
+Respond helpfully and concisely (2-4 sentences max). If they ask to send reminders, explain they can click the WhatsApp buttons in the dashboard. Use emojis sparingly for warmth. Do NOT use markdown.`;
+
+  try{
+    let reply;
+    if(!gKey()){reply='Please add your Gemini API key in the sidebar to enable AI responses. 🔑'}
+    else{reply=await callGemini(prompt)}
+    thinkEl.className='msg bot'; thinkEl.textContent=reply;
+  }catch(e){
+    thinkEl.className='msg bot'; thinkEl.textContent='Sorry, I ran into an issue: '+e.message;
+  }
+  const msgs=document.getElementById('chatMsgs');
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function buildContext(){
+  const high=patients.filter(p=>p.risk==='High');
+  const pend=patients.filter(p=>p.status==='pending'||p.status==='overdue');
+  return `Total patients today: ${patients.length}
+High-risk patients: ${high.map(p=>p.name+' ('+p.type+')').join(', ')||'None triaged yet'}
+Pending/overdue: ${pend.map(p=>p.name).join(', ')||'None'}
+WhatsApp messages sent: ${waCount}
+Total reminders sent: ${totalSent}
+No-show rate this week: 12% (down from 28% last month)`;
+}
+
+function addChatMsg(text,type){
+  const msgs=document.getElementById('chatMsgs');
+  const div=document.createElement('div');
+  div.className='msg '+type;
+  if(type==='thinking'){div.innerHTML='<div class="dots"><span></span><span></span><span></span></div>'}
+  else{div.textContent=text}
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+// ─── MODAL ───
+function closeMod(){document.getElementById('triageOv').classList.remove('open')}
+document.getElementById('triageOv').addEventListener('click',e=>{if(e.target===document.getElementById('triageOv'))closeMod()});
+document.getElementById('addOv').addEventListener('click',e=>{if(e.target===document.getElementById('addOv'))closeAdd()});
+
+// ─── TOAST ───
+let _t;
+function toast(msg,type='info'){
+  const el=document.getElementById('toast'); document.getElementById('toastMsg').textContent=msg;
+  el.className=`toast ${type} show`; clearTimeout(_t); _t=setTimeout(()=>el.classList.remove('show'),3600);
+}
+
+// ─── INIT ───
+render(); updateStatus();
+</script>
+</body>
+</html>
